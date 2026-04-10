@@ -1,0 +1,45 @@
+MDScreen:
+    md_bg_color: 0.95, 0.95, 0.95, 1
+
+    MDBoxLayout:
+        orientation: "vertical"
+        padding: "16dp"
+        spacing: "16dp"
+
+        MDTopAppBar:
+            type: "small"
+
+            MDTopAppBarTitle:
+                text: "POC Example"
+
+        BoxLayout:
+            orientation: "vertical"
+            spacing: "12dp"
+            size_hint_y: None
+            height: self.minimum_height
+
+            Button:
+                text: "Take a photo"
+                size_hint_y: None
+                height: "48dp"
+                background_normal: ""
+                background_color: 0.15, 0.45, 0.85, 1
+                color: 1, 1, 1, 1
+                on_release: app.take_photo()
+
+            Button:
+                text: "Scan QR"
+                size_hint_y: None
+                height: "48dp"
+                background_normal: ""
+                background_color: 0.15, 0.45, 0.85, 1
+                color: 1, 1, 1, 1
+                on_release: app.scan_qr()
+
+        TextInput:
+            id: log_box
+            text: "Started"
+            readonly: True
+            multiline: True
+            background_color: 1, 1, 1, 1
+            foreground_color: 0, 0, 0, 1
