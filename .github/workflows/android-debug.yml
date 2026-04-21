@@ -4,7 +4,7 @@ on:
   workflow_dispatch:
 
 permissions:
-  contents: write
+  contents: read
 
 jobs:
   build-android:
@@ -36,13 +36,15 @@ jobs:
       - name: Add local bin to PATH
         run: echo "$HOME/.local/bin" >> $GITHUB_PATH
 
-      # Setup Python environment
-      - name: Setup Python + Buildozer
-        run: |
-          python3 -m venv venv
-          source venv/bin/activate
-          pip install --upgrade pip
-          
+      # Cache pip downloads to speed up dependency installs
+      - name: Cache pip
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/pip
+          key: ${{ runner.os }}-pip-android-widgets-buildozer-cython-0.29.34
+          restore-keys: |
+            ${{ runner.os }}-pip-
+
       # Prepare Buildozer SDK folder
       - name: Prepare Android SDK folder
         run: |
@@ -70,7 +72,7 @@ jobs:
         run: |
           yes | ~/.buildozer/android/platform/android-sdk/tools/bin/sdkmanager --licenses
 
-      # Install build-tools required for aidl
+      # Install Android build-tools required for aidl
       - name: Install Android build-tools
         run: |
           yes | ~/.buildozer/android/platform/android-sdk/tools/bin/sdkmanager "build-tools;29.0.0"
@@ -79,13 +81,13 @@ jobs:
       - name: Build APK
         id: build
         run: |
+          pip install --upgrade pip
           pip install android-widgets git+https://github.com/kivy/buildozer legacy-cgi setuptools cython==0.29.34
           buildozer android debug
           APK=$(find ./bin -name "*-debug.apk" | head -n 1)
           echo "apk=$APK" >> $GITHUB_OUTPUT
           echo "Built APK: $APK"
-          
-          
+
       - name: Upload artifacts
         uses: actions/upload-artifact@v4
         with:
